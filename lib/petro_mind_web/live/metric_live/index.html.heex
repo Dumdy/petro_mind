@@ -1,0 +1,136 @@
+<div class="-mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  <%= for {_id, metric} <- @streams.meterics do %>
+    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition">
+      <h3 class="text-xs text-gray-400 mb-2">
+        <span class="inline-flex items-center gap-1">
+          <.icon name="hero-calendar" class="w-4 h-4" />
+          {Calendar.strftime(metric.inserted_at, "%b %-d, %Y · %H:%M")}
+        </span>
+      </h3>
+
+      <div class="space-y-4">
+        <div>
+          <p class="text-sm text-gray-500">Production Rate</p>
+          <p class="text-2xl font-bold text-blue-700">{metric.production_rate} bbl/day</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Water Cut</p>
+          <p class="text-xl font-semibold text-indigo-600">{metric.water_cut} %</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Average Flow Rate</p>
+          <p class="text-xl font-semibold text-emerald-600">{metric.average_flow_rate} m³/day</p>
+        </div>
+
+        <div>
+          <p class="text-sm text-gray-500">Down Time</p>
+          <%= if metric.down_time > 0 do %>
+            <p class="text-xl font-semibold text-red-600">{metric.down_time} hrs</p>
+          <% else %>
+            <p class="text-xl font-semibold text-green-600">No Downtime</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  <!-- Production Rate Chart -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Production Rate</h2>
+
+    <% production_rate_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    production_rate_data =
+      Enum.map(@metrics, fn metric ->
+        metric.production_rate
+      end) %>
+
+    <canvas
+      id="production-rate-chart"
+      phx-hook="ProductionRate"
+      data-labels={Jason.encode!(production_rate_labels)}
+      data-values={Jason.encode!(production_rate_data)}
+      class="w-full h-64"
+    />
+  </div>
+  
+<!-- Water Cut Chart -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Water Cut</h2>
+
+    <% water_cut_rate_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    water_cut_rate_data =
+      Enum.map(@metrics, fn metric ->
+        metric.water_cut
+      end) %>
+
+    <canvas
+      id="water-cut-chart"
+      phx-hook="WaterCutRate"
+      data-labels={Jason.encode!(water_cut_rate_labels)}
+      data-values={Jason.encode!(water_cut_rate_data)}
+      class="w-full h-64"
+    />
+  </div>
+</div>
+
+<div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+  <!-- Production Rate Chart -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Average Flow Rate</h2>
+
+    <% flow_rate_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    flow_rate_data =
+      Enum.map(@metrics, fn metric ->
+        metric.average_flow_rate
+      end) %>
+
+    <canvas
+      id="average-flow-rate-chart"
+      phx-hook="AverageFlowRate"
+      data-labels={Jason.encode!(flow_rate_labels)}
+      data-values={Jason.encode!(flow_rate_data)}
+      class="w-full h-64"
+    />
+  </div>
+  
+<!-- Water Cut Chart -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Down Time Hours</h2>
+
+    <% down_time_hours_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    down_time_hours_data =
+      Enum.map(@metrics, fn metric ->
+        metric.down_time
+      end) %>
+
+    <canvas
+      id="down-time-hours-chart"
+      phx-hook="DownTimeHours"
+      data-labels={Jason.encode!(down_time_hours_labels)}
+      data-values={Jason.encode!(down_time_hours_data)}
+      class="w-full h-64"
+    />
+  </div>
+</div>
+
+

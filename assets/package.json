@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "chart.js": "^4.4.9",
+    "phoenix": "^1.7.21",
+    "phoenix_html": "^4.2.1",
+    "phoenix_live_view": "^1.0.15"
+  }
+}

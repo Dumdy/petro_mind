@@ -17,6 +17,12 @@ defmodule PetroMindWeb.Router do
   scope "/", PetroMindWeb do
     pipe_through :browser
 
+    live "/meterics", MetricLive.Index, :index
+    live "/meterics/new", MetricLive.Index, :new
+    live "/meterics/:id/edit", MetricLive.Index, :edit
+    live "/meterics/:id", MetricLive.Show, :show
+    live "/meterics/:id/show/edit", MetricLive.Show, :edit
+
     get "/", PageController, :home
   end
 
