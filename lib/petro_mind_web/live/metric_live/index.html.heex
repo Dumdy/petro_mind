@@ -1,6 +1,6 @@
-<div class="-mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  <%= for {_id, metric} <- @streams.meterics do %>
-    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition">
+<div class="-mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+  <%= for {metric, _id} <- Enum.with_index(@metrics) do %>
+    <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition space-y-4">
       <h3 class="text-xs text-gray-400 mb-2">
         <span class="inline-flex items-center gap-1">
           <.icon name="hero-calendar" class="w-4 h-4" />
@@ -8,29 +8,49 @@
         </span>
       </h3>
 
-      <div class="space-y-4">
-        <div>
-          <p class="text-sm text-gray-500">Production Rate</p>
-          <p class="text-2xl font-bold text-blue-700">{metric.production_rate} bbl/day</p>
+      <div class="grid grid-cols-2 gap-3">
+        <!-- Production Rate -->
+        <div class="p-2 rounded-lg border bg-blue-50 border-blue-100">
+          <p class="text-[10px] font-medium text-blue-700">Production Rate</p>
+          <p class="text-sm font-semibold text-blue-900">{metric.production_rate} bbl/day</p>
         </div>
-
-        <div>
-          <p class="text-sm text-gray-500">Water Cut</p>
-          <p class="text-xl font-semibold text-indigo-600">{metric.water_cut} %</p>
+        
+<!-- Water Cut -->
+        <div class="p-2 rounded-lg border bg-indigo-50 border-indigo-100">
+          <p class="text-[10px] font-medium text-indigo-700">Water Cut</p>
+          <p class="text-sm font-semibold text-indigo-900">{metric.water_cut} %</p>
         </div>
-
-        <div>
-          <p class="text-sm text-gray-500">Average Flow Rate</p>
-          <p class="text-xl font-semibold text-emerald-600">{metric.average_flow_rate} m³/day</p>
+        
+<!-- Average Flow Rate -->
+        <div class="p-2 rounded-lg border bg-emerald-50 border-emerald-100">
+          <p class="text-[10px] font-medium text-emerald-700">Avg Flow Rate</p>
+          <p class="text-sm font-semibold text-emerald-900">{metric.average_flow_rate} m³/day</p>
         </div>
+        
+<!-- Uptime Ratio -->
+        <div class="p-2 rounded-lg border bg-yellow-50 border-yellow-100">
+          <p class="text-[10px] font-medium text-yellow-700">Uptime Ratio</p>
+          <p class="text-sm font-semibold text-yellow-900">{metric.uptime_ratio} %</p>
+        </div>
+        
+<!-- Average Pressure -->
+        <div class="p-2 rounded-lg border bg-purple-50 border-purple-100">
+          <p class="text-[10px] font-medium text-purple-700">Avg Pressure</p>
+          <p class="text-sm font-semibold text-purple-900">{metric.average_pressure} psi</p>
+        </div>
+        
+<!-- Down Time (with conditional styling) -->
+        <% {bg_class, border_class, label_class, value_class, text} =
+          if metric.down_time > 0 do
+            {"bg-red-50", "border-red-100", "text-red-700", "text-red-900",
+             "#{metric.down_time} hrs"}
+          else
+            {"bg-green-50", "border-green-100", "text-green-700", "text-green-900", "No Downtime"}
+          end %>
 
-        <div>
-          <p class="text-sm text-gray-500">Down Time</p>
-          <%= if metric.down_time > 0 do %>
-            <p class="text-xl font-semibold text-red-600">{metric.down_time} hrs</p>
-          <% else %>
-            <p class="text-xl font-semibold text-green-600">No Downtime</p>
-          <% end %>
+        <div class={"p-2 rounded-lg border #{bg_class} #{border_class}"}>
+          <p class={"text-[10px] font-medium #{label_class}"}>Downtime</p>
+          <p class={"text-sm font-semibold #{value_class}"}>{text}</p>
         </div>
       </div>
     </div>
@@ -132,5 +152,3 @@
     />
   </div>
 </div>
-
-

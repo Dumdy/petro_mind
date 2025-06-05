@@ -23,7 +23,19 @@ defmodule PetroMindWeb.Router do
     live "/meterics/:id", MetricLive.Show, :show
     live "/meterics/:id/show/edit", MetricLive.Show, :edit
 
-    get "/", PageController, :home
+    live "/reports", ReportLive.Index, :index
+    live "/reports/new", ReportLive.Index, :new
+    live "/reports/:id/edit", ReportLive.Index, :edit
+
+    live "/reports/:id", ReportLive.Show, :show
+    live "/reports/:id/show/edit", ReportLive.Show, :edit
+
+    live "/chats", ChatLive.Index, :index
+    live "/chats/new", ChatLive.Index, :new
+    live "/chats/:id/edit", ChatLive.Index, :edit
+
+    live "/chats/:id", ChatLive.Show, :show
+    live "/chats/:id/show/edit", ChatLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

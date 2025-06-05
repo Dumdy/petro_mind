@@ -1,0 +1,72 @@
+<div class="min-h-screen bg-gray-50 py-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <.header>
+      Reports
+    </.header>
+
+    <div class="mt-8 space-y-6">
+      <%= for {_id, report} <- @reports do %>
+        <div class="bg-white shadow rounded-lg overflow-hidden">
+          <div class="px-6 py-4 bg-gray-50 border-b">
+            <h3 class="text-lg font-medium text-gray-900">
+              Report created: {Calendar.strftime(report.inserted_at, "%B %d, %Y at %I:%M %p UTC")}
+            </h3>
+          </div>
+
+          <div class="p-6">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Report Type</dt>
+                <dd class="mt-1 text-sm text-gray-900 capitalize">
+                  {String.replace(report.report_type, "_", " ")}
+                </dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Value</dt>
+                <dd class="mt-1 text-sm text-gray-900">{report.value}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Threshold</dt>
+                <dd class="mt-1 text-sm text-gray-900">{report.threshold}</dd>
+              </div>
+              <div>
+                <dt class="text-sm font-medium text-gray-500">Status</dt>
+                <dd class="mt-1">
+                  <span class={[
+                    "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+                    if(report.status == "Normal",
+                      do: "bg-green-100 text-green-800",
+                      else: "bg-red-100 text-red-800"
+                    )
+                  ]}>
+                    {report.status}
+                  </span>
+                </dd>
+              </div>
+            </div>
+
+            <div class="mt-4">
+              <.link
+                navigate={~p"/reports/#{report.id}"}
+                class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
+              >
+                View Details →
+              </.link>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<.modal :if={@live_action == :delete} id="delete-modal" show on_cancel={JS.patch(~p"/reports")}>
+  <.live_component
+    module={PetroMindWeb.ReportLive.FormComponent}
+    id={@report.id || :new}
+    title={@page_title}
+    action={@live_action}
+    report={@report}
+    patch={~p"/reports"}
+  />
+</.modal>

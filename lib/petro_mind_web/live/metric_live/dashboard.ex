@@ -6,22 +6,17 @@ defmodule PetroMindWeb.MetricLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    metrics = Dashboard.list_meterics()
-
-    labels =
-      Enum.map(metrics, fn metric ->
-        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
-      end)
+    all_metrics = PetroMind.Dashboard.list_all_metrics()
 
     socket =
-      socket
-      |> stream(:meterics, metrics)
-      |> assign(:metrics, metrics)
-      |> assign(:labels, labels)
-      |> assign(:production_rates, Enum.map(metrics, & &1.production_rate))
-      |> assign(:water_cuts, Enum.map(metrics, & &1.water_cut))
-      |> assign(:average_flow_rates, Enum.map(metrics, & &1.average_flow_rate))
-      |> assign(:down_times, Enum.map(metrics, & &1.down_time))
+      assign(socket,
+        all_metrics: all_metrics,
+        metrics: Enum.take(all_metrics, 3),
+        current_index: 0
+      )
+
+    # Rotate every 5 seconds
+    Process.send_after(self(), :next_metrics, 5000)
 
     {:ok, socket}
   end
@@ -30,6 +25,8 @@ defmodule PetroMindWeb.MetricLive.Index do
   def handle_params(params, _url, socket) do
     {:noreply, apply_action(socket, socket.assigns.live_action, params)}
   end
+
+
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
@@ -49,20 +46,29 @@ defmodule PetroMindWeb.MetricLive.Index do
     |> assign(:metric, nil)
   end
 
-  def handle_info(:tick, %{assigns: %{metrics: []}} = socket) do
-    {:noreply, socket}
-  end
-
-  def handle_info(:tick, socket) do
-    metrics = socket.assigns.metrics
-    next_index = rem(socket.assigns.current_index + 1, length(metrics))
-
-    {:noreply, assign(socket, :current_index, next_index)}
-  end
-
   @impl true
-  def handle_info({PetroMindWeb.MetricLive.FormComponent, {:saved, metric}}, socket) do
-    {:noreply, stream_insert(socket, :meterics, metric)}
+  def handle_info(:next_metrics, socket) do
+    all_metrics = socket.assigns.all_metrics
+    current_index = socket.assigns.current_index
+    total = length(all_metrics)
+
+    # Move to next chunk of 3
+    next_index = rem(current_index + 3, total)
+
+    metrics_to_show =
+      all_metrics
+      # allow wrapping around
+      |> Enum.concat(all_metrics)
+      |> Enum.slice(next_index, 3)
+
+    # Reschedule the timer
+    Process.send_after(self(), :next_metrics, 5000)
+
+    {:noreply,
+     assign(socket,
+       metrics: metrics_to_show,
+       current_index: next_index
+     )}
   end
 
   @impl true
