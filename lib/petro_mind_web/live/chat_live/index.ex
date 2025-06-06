@@ -6,7 +6,12 @@ defmodule PetroMindWeb.ChatLive.Index do
 
   @impl true
   def mount(_params, _session, socket) do
-    {:ok, stream(socket, :chats, Dashboard.list_chats())}
+    {:ok,
+     socket
+     |> assign(:query, "")
+     |> assign(:response, nil)
+     |> assign(:page_title, "Listing Chats")
+     |> assign(:chat, nil)}
   end
 
   @impl true
@@ -38,10 +43,12 @@ defmodule PetroMindWeb.ChatLive.Index do
   end
 
   @impl true
-  def handle_event("delete", %{"id" => id}, socket) do
-    chat = Dashboard.get_chat!(id)
-    {:ok, _} = Dashboard.delete_chat(chat)
+  def handle_event("send_search", %{"query" => query}, socket) do
+    response = PetroMind.Dashboard.analyze_input(query)
 
-    {:noreply, stream_delete(socket, :chats, chat)}
+    {:noreply,
+     socket
+     |> assign(:query, query)
+     |> assign(:response, response)}
   end
 end

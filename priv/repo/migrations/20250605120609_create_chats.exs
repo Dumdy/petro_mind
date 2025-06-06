@@ -4,11 +4,11 @@ defmodule PetroMind.Repo.Migrations.CreateChats do
   def change do
     create table(:chats) do
       add :message, :string
-      add :metric_id, references(:meterics, on_delete: :delete_all)
+      add :report_id, references(:reports, on_delete: :delete_all)
 
       timestamps(type: :utc_datetime)
     end
 
-    create index(:chats, [:metric_id])
+    create index(:chats, [:report_id])
   end
 end

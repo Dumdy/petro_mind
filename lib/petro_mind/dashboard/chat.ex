@@ -1,11 +1,11 @@
 defmodule PetroMind.Dashboard.Chat do
   use Ecto.Schema
   import Ecto.Changeset
-  alias PetroMind.Dashboard.Metric
+  alias PetroMind.Dashboard.Report
 
   schema "chats" do
     field :message, :string
-    belongs_to :metric, Metric
+    belongs_to :report, Report
 
     timestamps(type: :utc_datetime)
   end
@@ -15,6 +15,6 @@ defmodule PetroMind.Dashboard.Chat do
     chat
     |> cast(attrs, [:message])
     |> validate_required([:message])
-    |> assoc_constraint(:metric)
+    |> assoc_constraint(:report)
   end
 end

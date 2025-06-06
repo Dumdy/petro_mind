@@ -2,7 +2,7 @@ import Chart from 'chart.js/auto';
 
 
 
-const WaterCutRate = {
+const AveragePressure = {
     mounted() {
         this.drawChart();
     },
@@ -27,10 +27,10 @@ const WaterCutRate = {
             data: {
                 labels: labels,
                 datasets: [{
-                    label: 'Water Cut(%)',
+                    label: 'Average Pressure(psi)',
                     data: values,
-                    backgroundColor: 'rgba(146, 141, 151, 0.5)',
-                    borderColor: 'rgb(228, 236, 231)',
+                    backgroundColor: 'rgba(54, 235, 99, 0.5)',
+                    borderColor: 'rgb(54, 235, 108)',
                     borderWidth: 1,
                     barThickness: 30
                 }]
@@ -52,7 +52,7 @@ const WaterCutRate = {
     }
 };
 
-export default WaterCutRate;
+export default AveragePressure;
 
 
 

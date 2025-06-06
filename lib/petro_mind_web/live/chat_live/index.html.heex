@@ -1,41 +1,29 @@
 <.header>
-  Listing Chats
-  <:actions>
-    <.link patch={~p"/chats/new"}>
-      <.button>New Chat</.button>
-    </.link>
-  </:actions>
+  PetroMind Chat
 </.header>
 
-<.table
-  id="chats"
-  rows={@streams.chats}
-  row_click={fn {_id, chat} -> JS.navigate(~p"/chats/#{chat}") end}
->
-  <:col :let={{_id, chat}} label="Message">{chat.message}</:col>
-  <:action :let={{_id, chat}}>
-    <div class="sr-only">
-      <.link navigate={~p"/chats/#{chat}"}>Show</.link>
-    </div>
-    <.link patch={~p"/chats/#{chat}/edit"}>Edit</.link>
-  </:action>
-  <:action :let={{id, chat}}>
-    <.link
-      phx-click={JS.push("delete", value: %{id: chat.id}) |> hide("##{id}")}
-      data-confirm="Are you sure?"
-    >
-      Delete
-    </.link>
-  </:action>
-</.table>
-
-<.modal :if={@live_action in [:new, :edit]} id="chat-modal" show on_cancel={JS.patch(~p"/chats")}>
-  <.live_component
-    module={PetroMindWeb.ChatLive.FormComponent}
-    id={@chat.id || :new}
-    title={@page_title}
-    action={@live_action}
-    chat={@chat}
-    patch={~p"/chats"}
+<form phx-submit="send_search" class="max-w-3xl mx-auto mt-8">
+  <input
+    type="text"
+    name="query"
+    value={@query}
+    placeholder="Type your question here..."
+    class="w-full px-4 py-3 text-base rounded-md border-gray-300 shadow-sm focus:ring-indigo-500 focus:border-indigo-500"
+    autocomplete="off"
   />
-</.modal>
+
+  <div class="flex justify-end mt-4">
+    <button
+      type="submit"
+      class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded hover:bg-indigo-700"
+    >
+      Send
+    </button>
+  </div>
+</form>
+
+<%= if @response do %>
+  <div class="mt-6 max-w-3xl mx-auto p-4 bg-white rounded-md shadow">
+    <p class="text-gray-700 whitespace-pre-line">{@response}</p>
+  </div>
+<% end %>

@@ -26,6 +26,8 @@ import ProductionRate from "./production_rate_chart_hooks"
 import WaterCutRate from "./water_cut_rate_hooks"
 import AverageFlowRate from "./average_flow_rate_chart_hooks"
 import DownTimeHours from "./down_time_chart_hook"
+import UptimeRatio from "./uptime_ratio_chart_hooks"
+import AveragePressure from "./average_pressure_rate_chart_hooks"
 
 
 Window.Chart = Chart
@@ -39,7 +41,10 @@ let liveSocket = new LiveSocket("/live", Socket, {
     ProductionRate,
     WaterCutRate,
     AverageFlowRate,
-    DownTimeHours
+    DownTimeHours,
+    UptimeRatio,
+    AveragePressure
+
   }
 })
 

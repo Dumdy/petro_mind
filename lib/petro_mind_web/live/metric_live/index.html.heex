@@ -105,8 +105,9 @@
   </div>
 </div>
 
+<!-- Average Flow Rate Chart -->
+
 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-  <!-- Production Rate Chart -->
   <div class="bg-white p-6 rounded-2xl shadow-md">
     <h2 class="text-lg font-semibold text-gray-700 mb-4">Average Flow Rate</h2>
 
@@ -129,7 +130,7 @@
     />
   </div>
   
-<!-- Water Cut Chart -->
+<!-- Down Time Hours -->
   <div class="bg-white p-6 rounded-2xl shadow-md">
     <h2 class="text-lg font-semibold text-gray-700 mb-4">Down Time Hours</h2>
 
@@ -148,6 +149,75 @@
       phx-hook="DownTimeHours"
       data-labels={Jason.encode!(down_time_hours_labels)}
       data-values={Jason.encode!(down_time_hours_data)}
+      class="w-full h-64"
+    />
+  </div>
+  
+<!-- Down Time Hours -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Down Time Hours</h2>
+
+    <% down_time_hours_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    down_time_hours_data =
+      Enum.map(@metrics, fn metric ->
+        metric.down_time
+      end) %>
+
+    <canvas
+      id="down-time-hours-chart"
+      phx-hook="DownTimeHours"
+      data-labels={Jason.encode!(down_time_hours_labels)}
+      data-values={Jason.encode!(down_time_hours_data)}
+      class="w-full h-64"
+    />
+  </div>
+  
+<!-- Uptime Ratio -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Uptime Ratio</h2>
+
+    <% uptime_ratio_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    uptime_ratio_data =
+      Enum.map(@metrics, fn metric ->
+        metric.uptime_ratio
+      end) %>
+
+    <canvas
+      id="uptime-ratio-chart"
+      phx-hook="UptimeRatio"
+      data-labels={Jason.encode!(uptime_ratio_labels)}
+      data-values={Jason.encode!(uptime_ratio_data)}
+      class="w-full h-64"
+    />
+  </div>
+  
+<!-- Average Pressure -->
+  <div class="bg-white p-6 rounded-2xl shadow-md">
+    <h2 class="text-lg font-semibold text-gray-700 mb-4">Average Pressure</h2>
+
+    <% average_pressure_labels =
+      Enum.map(@metrics, fn metric ->
+        Calendar.strftime(metric.inserted_at, "%b %-d %H:%M")
+      end)
+
+    average_pressure_data =
+      Enum.map(@metrics, fn metric ->
+        metric.average_pressure
+      end) %>
+
+    <canvas
+      id="average-pressure-chart"
+      phx-hook="AveragePressure"
+      data-labels={Jason.encode!(average_pressure_labels)}
+      data-values={Jason.encode!(average_pressure_data)}
       class="w-full h-64"
     />
   </div>

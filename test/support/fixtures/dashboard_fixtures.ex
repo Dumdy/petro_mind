@@ -37,26 +37,6 @@ defmodule PetroMind.DashboardFixtures do
     report
   end
 
-
-
-  @doc """
-  Generate a report.
-  """
-  def report_fixture(attrs \\ %{}) do
-    {:ok, report} =
-      attrs
-      |> Enum.into(%{
-        T: "some T",
-        name: "some name",
-        status: "some status",
-        threshold: "some threshold",
-        value: "some value"
-      })
-      |> PetroMind.Dashboard.create_report()
-
-    report
-  end
-
   @doc """
   Generate a chat.
   """

@@ -6,7 +6,9 @@ defmodule PetroMind.Dashboard do
   import Ecto.Query, warn: false
   alias PetroMind.Repo
 
-  alias PetroMind.Dashboard.{Metric, Report}
+  alias PetroMind.Dashboard.{Chat, Metric, Report}
+
+  @confidence_threshold 0.3
 
   @doc """
   Returns the list of meterics.
@@ -233,46 +235,101 @@ defmodule PetroMind.Dashboard do
     Repo.delete(report)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking report changes.
+  def analyze_input(input_text) do
+    reports = Repo.all(Report)
 
-  ## Examples
+    matches =
+      reports
+      |> Enum.map(fn report ->
+        score = similarity_score(input_text, report.report_type)
+        {report, score}
+      end)
+      |> Enum.filter(fn {_report, score} -> score > 0 end)
+      |> Enum.sort_by(fn {_report, score} -> -score end)
 
-      iex> change_report(report)
-      %Ecto.Changeset{data: %Report{}}
+    cond do
+      matches == [] ->
+        "❌ I couldn't find anything related to your input."
 
-  """
-  def change_report(%Report{} = report, attrs \\ %{}) do
-    Report.changeset(report, attrs)
+      is_question?(input_text) ->
+        handle_question_input(matches)
+
+      true ->
+        handle_keyword_input(matches)
+    end
   end
 
-  def generate_ten_random_metrics do
-    1..10
-    |> Enum.map(fn i ->
-      metric_attrs = %{
-        production_rate: Enum.random(15000..25000),
-        water_cut: Enum.random(10..45),
-        down_time: :rand.uniform(5),
-        average_flow_rate: Enum.random(150..250),
-        uptime_ratio: (85 + :rand.uniform() * 15) |> Float.round(2),
-        average_pressure: Enum.random(150..250)
-      }
-
-      case PetroMind.Dashboard.create_metric(metric_attrs) do
-        {:ok, metric} ->
-          IO.puts("✓ Created random metric #{i}: ID #{metric.id}")
-          {:ok, metric}
-
-        {:error, changeset} ->
-          IO.puts("✗ Failed to create random metric #{i}: #{inspect(changeset.errors)}")
-          {:error, changeset}
-      end
-    end)
+  defp handle_question_input([{report, score} | _]) when score >= @confidence_threshold do
+    format_detailed_response(report, score)
   end
 
-  
+  defp handle_question_input(matches) do
+    suggestions =
+      matches
+      |> Enum.take(3)
+      |> Enum.map(fn {%{report_type: type}, score} ->
+        "- #{type} (#{percent(score)}%)"
+      end)
+      |> Enum.join("\n")
 
-  alias PetroMind.Dashboard.Chat
+    """
+    🤔 I couldn't confidently match your question. Did you mean one of these?
+
+    #{suggestions}
+    """
+  end
+
+  defp handle_keyword_input(matches) do
+    summaries =
+      matches
+      |> Enum.take(3)
+      |> Enum.map(fn {report, score} ->
+        """
+        📌 #{report.report_type}
+        Confidence: #{percent(score)}%
+        Status: #{report.status}
+        Value: #{report.value} (Threshold: #{report.threshold})
+        Recorded on: #{format_datetime(report.inserted_at)}
+        """
+      end)
+      |> Enum.join("\n\n")
+
+    "🔍 Here are some reports related to your input:\n\n" <> summaries
+  end
+
+  defp is_question?(input) do
+    String.trim(input)
+    |> String.ends_with?(["?", "what", "how", "is", "are", "was", "can", "could"])
+  end
+
+  defp format_detailed_response(report, score) do
+    """
+    📊 **#{report.report_type}**
+    Confidence: #{percent(score)}%
+    Status: #{report.status}
+    Value: #{report.value} (Threshold: #{report.threshold})
+    Recorded on: #{format_datetime(report.inserted_at)}
+    """
+  end
+
+  defp percent(score), do: Float.round(score * 100, 1)
+
+  defp format_datetime(nil), do: "unknown"
+
+  defp format_datetime(datetime) do
+    datetime
+    |> Timex.format!("%B %d, %Y at %I:%M %p %Z", :strftime)
+  end
+
+  defp similarity_score(input, report_type) do
+    input = String.downcase(input)
+    report = String.downcase(report_type)
+
+    cond do
+      String.contains?(input, report) -> 1.0
+      true -> String.jaro_distance(input, report)
+    end
+  end
 
   @doc """
   Returns the list of chats.
@@ -353,18 +410,5 @@ defmodule PetroMind.Dashboard do
   """
   def delete_chat(%Chat{} = chat) do
     Repo.delete(chat)
-  end
-
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking chat changes.
-
-  ## Examples
-
-      iex> change_chat(chat)
-      %Ecto.Changeset{data: %Chat{}}
-
-  """
-  def change_chat(%Chat{} = chat, attrs \\ %{}) do
-    Chat.changeset(chat, attrs)
   end
 end
