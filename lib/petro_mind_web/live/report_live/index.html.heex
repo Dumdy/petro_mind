@@ -4,6 +4,14 @@
       Reports
     </.header>
 
+    <.link
+      href={~p"/reports/downloads/pdf"}
+      class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+      target="_blank"
+    >
+      Download Reports
+    </.link>
+
     <div class="mt-8 space-y-6">
       <%= for {_id, report} <- @reports do %>
         <div class="bg-white shadow rounded-lg overflow-hidden">
@@ -50,7 +58,7 @@
                 navigate={~p"/reports/#{report.id}"}
                 class="text-indigo-600 hover:text-indigo-500 text-sm font-medium"
               >
-                View Details →
+                View Report→
               </.link>
             </div>
           </div>

@@ -1,19 +1,55 @@
 <.header>
-  Report {@report.id}
-  <:subtitle>This is a report record from your database.</:subtitle>
+  {String.replace(@report.report_type, "_", " ")
+  |> String.split(" ")
+  |> Enum.map(&String.capitalize/1)
+  |> Enum.join(" ")} Report
   <:actions>
     <.link patch={~p"/reports/#{@report}/show/edit"} phx-click={JS.push_focus()}>
-      <.button>Edit report</.button>
+      <.button>Generate PDF</.button>
     </.link>
   </:actions>
 </.header>
 
-<.list>
-  <:item title="Name">{@report.name}</:item>
-  <:item title="Value">{@report.value}</:item>
-  <:item title="Threshold">{@report.threshold}</:item>
-  <:item title="Status">{@report.status}</:item>
-</.list>
+<div class="bg-white shadow rounded-lg overflow-hidden mt-6">
+  <div class="px-6 py-4 bg-gray-50 border-b">
+    <h3 class="text-lg font-medium text-gray-900">
+      Report created: {Calendar.strftime(@report.inserted_at, "%B %d, %Y at %I:%M %p UTC")}
+    </h3>
+  </div>
+
+  <div class="p-6">
+    <div class="grid grid-cols-2 gap-4 sm:grid-cols-4">
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Report Type</dt>
+        <dd class="mt-1 text-sm text-gray-900 capitalize">
+          {String.replace(@report.report_type, "_", " ")}
+        </dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Value</dt>
+        <dd class="mt-1 text-sm text-gray-900">{@report.value}</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Threshold</dt>
+        <dd class="mt-1 text-sm text-gray-900">{@report.threshold}</dd>
+      </div>
+      <div>
+        <dt class="text-sm font-medium text-gray-500">Status</dt>
+        <dd class="mt-1">
+          <span class={[
+            "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
+            if(@report.status == "Normal",
+              do: "bg-green-100 text-green-800",
+              else: "bg-red-100 text-red-800"
+            )
+          ]}>
+            {@report.status}
+          </span>
+        </dd>
+      </div>
+    </div>
+  </div>
+</div>
 
 <.back navigate={~p"/reports"}>Back to reports</.back>
 

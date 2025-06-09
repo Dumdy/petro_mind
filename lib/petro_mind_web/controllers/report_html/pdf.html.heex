@@ -1,0 +1,21 @@
+<h2 class="text-lg font-semibold mb-4">Report Chart</h2>
+<svg width="400" height="200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Grid lines -->
+  <line x1="0" y1="180" x2="400" y2="180" stroke="#e5e7eb" />
+  <line x1="0" y1="120" x2="400" y2="120" stroke="#e5e7eb" />
+  <line x1="0" y1="60" x2="400" y2="60" stroke="#e5e7eb" />
+
+  <!-- Bars -->
+  <%= value_height = 180 - @report.value * 1.5 %>
+  <%= threshold_height = 180 - @report.threshold * 1.5 %>
+
+  <rect x="80" y={value_height} width="60" height={180 - value_height} fill="#6366f1" rx="4" />
+  <text x="80" y={value_height - 6} font-size="12" fill="#374151">Value</text>
+
+  <rect x="180" y={threshold_height} width="60" height={180 - threshold_height} fill="#f97316" rx="4" />
+  <text x="180" y={threshold_height - 6} font-size="12" fill="#374151">Threshold</text>
+
+  <!-- X axis labels -->
+  <text x="90" y="195" font-size="12" fill="#6b7280">Value</text>
+  <text x="190" y="195" font-size="12" fill="#6b7280">Threshold</text>
+</svg>

@@ -17,11 +17,11 @@ defmodule PetroMindWeb.Router do
   scope "/", PetroMindWeb do
     pipe_through :browser
 
-    live "/meterics", MetricLive.Index, :index
-    live "/meterics/new", MetricLive.Index, :new
-    live "/meterics/:id/edit", MetricLive.Index, :edit
-    live "/meterics/:id", MetricLive.Show, :show
-    live "/meterics/:id/show/edit", MetricLive.Show, :edit
+    live "/metrics", MetricLive.Index, :index
+    live "/metrics/new", MetricLive.Index, :new
+    live "/metrics/:id/edit", MetricLive.Index, :edit
+    live "/metrics/:id", MetricLive.Show, :show
+    live "/metrics/:id/show/edit", MetricLive.Show, :edit
 
     live "/reports", ReportLive.Index, :index
     live "/reports/new", ReportLive.Index, :new
@@ -36,6 +36,7 @@ defmodule PetroMindWeb.Router do
 
     live "/chats/:id", ChatLive.Show, :show
     live "/chats/:id/show/edit", ChatLive.Show, :edit
+    get "/reports/downloads/pdf", ReportsPDFController, :download_pdf
   end
 
   # Other scopes may use custom stacks.
