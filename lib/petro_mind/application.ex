@@ -17,8 +17,7 @@ defmodule PetroMind.Application do
       # Start a worker by calling: PetroMind.Worker.start_link(arg)
       # {PetroMind.Worker, arg},
       # Start to serve requests, typically the last entry
-      PetroMindWeb.Endpoint,
-       :pdf_generator
+      PetroMindWeb.Endpoint
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
